@@ -1,0 +1,29 @@
+# -*- coding: utf-8 -*-
+import json
+from botocore.vendored import requests
+ 
+def lambda_handler(event,context): # text type
+    url="https://oapi.dingtalk.com/robot/send?access_token=6883dca6d78906d8674f1e7ac376a885522e0e551a9ea9c61c8a0ba8415015cd"
+    message = event['Records'][0]['Sns']
+    Timestamp=message['Timestamp']
+    Subject=message['Subject']
+    if "ALARM" in Subject:
+        title="警报！！警报！！"
+    elif "OK" in Subject:
+        title="故障恢复"
+    pagrem={
+    "msgtype":"markdown",
+        "markdown": {"title":"AWS"+title,
+             "text":"## "+title+"\n ### 时间:"+Timestamp+" \n ### 内容："+Subject+" \n"
+        },
+        "at":{
+            "atMobiles":[
+                "185xxxxxxxx"
+            ]
+    },
+        "isAtAll": "true"
+    }
+    headers={
+        'Content-Type':'application/json'
+    }
+    requests.post(url,data=json.dumps(pagrem),headers=headers)
